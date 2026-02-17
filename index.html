@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dr. Sincero - Consulta</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0b141a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .phone-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            max-height: 850px;
+            background: #0b141a;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Header WhatsApp */
+        .header {
+            background: #1f2c34;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-back {
+            color: #00a884;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .header-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00a884, #25d366);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            font-weight: bold;
+            overflow: hidden;
+        }
+
+        .header-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .header-info {
+            flex: 1;
+        }
+
+        .header-name {
+            color: #e9edef;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .header-status {
+            color: #8696a0;
+            font-size: 13px;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 20px;
+            color: #aebac1;
+        }
+
+        .header-icons svg {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+        }
+
+        /* Chat Area */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 16px 100px;
+            background: #0b141a;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23182229' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: #374045;
+            border-radius: 3px;
+        }
+
+        /* Messages */
+        .message {
+            max-width: 85%;
+            margin-bottom: 4px;
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.received {
+            margin-right: auto;
+        }
+
+        .message.sent {
+            margin-left: auto;
+        }
+
+        .message-bubble {
+            padding: 8px 12px;
+            border-radius: 8px;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message.received .message-bubble {
+            background: #1f2c34;
+            color: #e9edef;
+            border-top-left-radius: 0;
+        }
+
+        .message.sent .message-bubble {
+            background: #005c4b;
+            color: #e9edef;
+            border-top-right-radius: 0;
+        }
+
+        .message-text {
+            font-size: 14.5px;
+            line-height: 1.4;
+            white-space: pre-line;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            text-align: right;
+            margin-top: 4px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .message.sent .message-time::after {
+            content: '✓✓';
+            color: #53bdeb;
+            font-size: 14px;
+        }
+
+        /* Image Message */
+        .message-image {
+            max-width: 100%;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .message-image:hover {
+            transform: scale(1.02);
+        }
+
+        .message-bubble.with-image {
+            padding: 4px;
+        }
+
+        .message-bubble.with-image .message-text {
+            padding: 4px 8px;
+        }
+
+        .message-bubble.with-image .message-time {
+            padding: 0 8px 4px;
+        }
+
+        /* Image Grid for Before/After */
+        .image-grid {
+            display: grid;
+            gap: 4px;
+            margin-bottom: 6px;
+        }
+
+        .image-grid.grid-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .image-grid.grid-3 {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .image-grid.grid-4 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .image-grid img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .image-grid img:hover {
+            opacity: 0.9;
+        }
+
+        .image-single {
+            margin-bottom: 6px;
+        }
+
+        .image-single img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        /* Audio Message */
+        .audio-message {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 220px;
+            padding: 4px 0;
+        }
+
+        .audio-play-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #00a884;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: transform 0.1s;
+        }
+
+        .audio-play-btn:active {
+            transform: scale(0.95);
+        }
+
+        .audio-play-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+            margin-left: 3px;
+        }
+
+        .audio-play-btn.playing svg {
+            margin-left: 0;
+        }
+
+        .audio-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .audio-waveform {
+            height: 28px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .audio-bar {
+            width: 3px;
+            background: #8696a0;
+            border-radius: 2px;
+            transition: background 0.1s;
+        }
+
+        .audio-bar.active {
+            background: #00a884;
+        }
+
+        .audio-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .audio-duration {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .audio-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00a884, #25d366);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+            font-weight: bold;
+            flex-shrink: 0;
+            overflow: hidden;
+            border: 2px solid #1f2c34;
+            margin-left: -8px;
+        }
+
+        .audio-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Buttons */
+        .buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .option-btn {
+            background: transparent;
+            border: 1px solid #00a884;
+            color: #00a884;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .option-btn:hover {
+            background: rgba(0, 168, 132, 0.1);
+        }
+
+        .option-btn:active {
+            background: rgba(0, 168, 132, 0.2);
+            transform: scale(0.98);
+        }
+
+        /* Input Area */
+        .input-area {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 420px;
+            background: #1f2c34;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: #2a3942;
+            border-radius: 24px;
+            padding: 8px 16px;
+        }
+
+        .emoji-btn {
+            background: none;
+            border: none;
+            color: #8696a0;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            margin-right: 8px;
+        }
+
+        #userInput {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #e9edef;
+            font-size: 15px;
+            outline: none;
+        }
+
+        #userInput::placeholder {
+            color: #8696a0;
+        }
+
+        .send-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #00a884;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .send-btn:hover {
+            background: #00c49a;
+        }
+
+        .send-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: white;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+            align-items: center;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: #8696a0;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-4px);
+                opacity: 1;
+            }
+        }
+
+        /* Date Divider */
+        .date-divider {
+            text-align: center;
+            margin: 16px 0;
+        }
+
+        .date-divider span {
+            background: #182229;
+            color: #8696a0;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        /* Highlights */
+        .highlight {
+            color: #00a884;
+            font-weight: 500;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0b141a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.3s;
+        }
+
+        .loading-logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #00a884, #25d366);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            animation: pulse 1.5s infinite;
+            overflow: hidden;
+        }
+
+        .loading-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .loading-logo svg {
+            width: 40px;
+            height: 40px;
+            fill: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .loading-text {
+            color: #8696a0;
+            font-size: 14px;
+        }
+
+        /* Image Modal */
+        .image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        .image-modal img {
+            max-width: 95%;
+            max-height: 95%;
+            object-fit: contain;
+        }
+
+        .image-modal.active {
+            display: flex;
+        }
+
+        /* Responsive */
+        @media (max-width: 420px) {
+            .phone-container {
+                max-height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Image Modal -->
+<div class="image-modal" id="imageModal" onclick="closeImageModal()">
+    <img id="modalImage" src="" alt="">
+</div>
+
+<!-- Loading Screen -->
+<div class="loading-screen" id="loadingScreen">
+    <div class="loading-logo" id="loadingLogo">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+    </div>
+    <div class="loading-text">Conectando...</div>
+</div>
+
+<!-- Phone Container -->
+<div class="phone-container">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-back">←</div>
+        <div class="header-avatar" id="headerAvatar">DS</div>
+        <div class="header-info">
+            <div class="header-name">Dr. Sincero</div>
+            <div class="header-status" id="headerStatus">online</div>
+        </div>
+        <div class="header-icons">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.9 14.3H15l-.3-.3c1-1.1 1.6-2.7 1.6-4.3 0-3.7-3-6.7-6.7-6.7S3 6 3 9.7s3 6.7 6.7 6.7c1.6 0 3.2-.6 4.3-1.6l.3.3v.8l5.1 5.1 1.5-1.5-5-5.2zm-6.2 0c-2.6 0-4.6-2.1-4.6-4.6s2.1-4.6 4.6-4.6 4.6 2.1 4.6 4.6-2 4.6-4.6 4.6z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 7a2 2 0 1 0-.001-4.001A2 2 0 0 0 12 7zm0 2a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 9zm0 6a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 15z"/></svg>
+        </div>
+    </div>
+
+    <!-- Chat -->
+    <div class="chat-container" id="chatContainer">
+        <div class="date-divider"><span>Hoje</span></div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-area">
+        <div class="input-container">
+            <button class="emoji-btn">😊</button>
+            <input type="text" id="userInput" placeholder="Digite uma mensagem" autocomplete="off">
+        </div>
+        <button class="send-btn" id="sendBtn">
+            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    // 📸 CONFIGURAÇÃO DAS IMAGENS
+    // ============================================================
+    //
+    // COMO ADICIONAR SUAS IMAGENS:
+    //
+    // 1. Hospede as imagens (mesmo servidor, Google Drive, Cloudinary, etc)
+    // 2. Cole as URLs abaixo
+    //
+    // Para Google Drive:
+    // - Compartilhe a imagem como "qualquer pessoa com o link"
+    // - Pegue o ID (parte depois de /d/ e antes de /view)
+    // - Use: https://drive.google.com/uc?export=view&id=SEU_ID
+    //
+    // ============================================================
+
+    const IMAGENS = {
+        // 👤 FOTO DE PERFIL DO DR. SINCERO
+        // Recomendado: 200x200px, formato quadrado
+        perfil: '', // Ex: 'imagens/dr-sincero.jpg'
+        
+        // ============================================
+        // 🍔 EMAGRECIMENTO - 2 imagens antes/depois
+        // ============================================
+        emagrecimento1: '', // Ex: 'imagens/emagrec-antes-depois-1.jpg'
+        emagrecimento2: '', // Ex: 'imagens/emagrec-antes-depois-2.jpg'
+        
+        // ============================================
+        // 🩸 GLICEMIA - 2 imagens antes/depois
+        // ============================================
+        glicemia1: '', // Ex: 'imagens/glicemia-antes-depois-1.jpg'
+        glicemia2: '', // Ex: 'imagens/glicemia-antes-depois-2.jpg'
+        
+        // ============================================
+        // ❤️ COLESTEROL - 2 imagens antes/depois
+        // ============================================
+        colesterol1: '', // Ex: 'imagens/colesterol-antes-depois-1.jpg'
+        colesterol2: '', // Ex: 'imagens/colesterol-antes-depois-2.jpg'
+        
+        // ============================================
+        // 💊 SAÚDE GERAL - 1 de cada categoria
+        // (usa 1 de emagrecimento, 1 de glicemia, 1 de colesterol)
+        // ============================================
+        // Não precisa adicionar nada aqui, vai usar as de cima automaticamente
+    };
+
+    // ============================================================
+    // 🎙️ CONFIGURAÇÃO DOS ÁUDIOS
+    // ============================================================
+
+    const AUDIOS = {
+        boasVindas: 'audios/01-boas-vindas.mp3',
+        prazerConhecer: 'audios/02-prazer-conhecer.mp3',
+        analisando: 'audios/03-analisando.mp3',
+        situacaoEmagrecimento: 'audios/04-situacao-emagrecimento.mp3',
+        naoAssustar: 'audios/05-nao-assustar.mp3',
+        todasConseguiram: 'audios/06-todas-conseguiram.mp3',
+        programa30dias: 'audios/07-programa-30-dias.mp3',
+        mastigadinho: 'audios/08-mastigadinho.mp3',
+        dinheiroProblema: 'audios/09-dinheiro-problema.mp3',
+        garantia: 'audios/10-garantia.mp3',
+        boaSorte: 'audios/11-boa-sorte.mp3',
+        reflexaoFinal: 'audios/12-reflexao-final.mp3',
+        glicemiaExplicacao: 'audios/13-glicemia-explicacao.mp3',
+        glicemiaAlimentacao: 'audios/14-glicemia-alimentacao.mp3',
+        colesterolExplicacao: 'audios/15-colesterol-explicacao.mp3',
+        colesterolDesentupidores: 'audios/16-colesterol-desentupidores.mp3',
+        saudeGeral: 'audios/17-saude-geral.mp3',
+    };
+
+    // ============================================================
+    // ⚙️ CONFIGURAÇÕES GERAIS
+    // ============================================================
+    
+    const CONFIG = {
+        // ⏱️ VELOCIDADES (em milissegundos)
+        typingDelay: 2000,
+        messageDelay: 1000,
+        longMessageDelay: 2500,
+        audioRecordingDelay: 1500,
+        
+        // 🔗 LINKS DE CHECKOUT POR PRODUTO
+        checkoutUrls: {
+            emagrecimento: 'https://pay.kiwify.com.br/e2JVLiN',
+            glicemia: 'https://pay.kiwify.com.br/kKErY4s',
+            colesterol: 'https://pay.kiwify.com.br/1xAKS1k',
+            saude_geral: 'https://pay.kiwify.com.br/etBYjV0',
+        },
+    };
+
+    // ============================================================
+    // 🔧 CÓDIGO DO CHATBOT
+    // ============================================================
+
+    let state = {
+        step: 'start',
+        userName: '',
+        userAge: '',
+        userWeight: '',
+        userGoal: '',
+        problem: ''
+    };
+
+    let currentAudio = null;
+
+    const chatContainer = document.getElementById('chatContainer');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const headerStatus = document.getElementById('headerStatus');
+    const loadingScreen = document.getElementById('loadingScreen');
+    const headerAvatar = document.getElementById('headerAvatar');
+    const loadingLogo = document.getElementById('loadingLogo');
+
+    // Aplicar foto de perfil se existir
+    function applyProfileImage() {
+        if (IMAGENS.perfil) {
+            headerAvatar.innerHTML = `<img src="${IMAGENS.perfil}" alt="Dr. Sincero">`;
+            loadingLogo.innerHTML = `<img src="${IMAGENS.perfil}" alt="Dr. Sincero">`;
+        }
+    }
+
+    function getCurrentTime() {
+        const now = new Date();
+        return now.getHours().toString().padStart(2, '0') + ':' + 
+               now.getMinutes().toString().padStart(2, '0');
+    }
+
+    function scrollToBottom() {
+        setTimeout(() => {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }, 100);
+    }
+
+    function showTyping() {
+        headerStatus.textContent = 'digitando...';
+        const existing = document.getElementById('typingIndicator');
+        if (existing) return;
+        
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message received';
+        typingDiv.id = 'typingIndicator';
+        typingDiv.innerHTML = `
+            <div class="message-bubble">
+                <div class="typing-indicator">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        `;
+        chatContainer.appendChild(typingDiv);
+        scrollToBottom();
+    }
+
+    function hideTyping() {
+        headerStatus.textContent = 'online';
+        const typing = document.getElementById('typingIndicator');
+        if (typing) typing.remove();
+    }
+
+    function generateWaveform() {
+        let bars = '';
+        for (let i = 0; i < 27; i++) {
+            const height = Math.random() * 18 + 4;
+            bars += `<div class="audio-bar" style="height: ${height}px"></div>`;
+        }
+        return bars;
+    }
+
+    function formatDuration(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function openImageModal(src) {
+        const modal = document.getElementById('imageModal');
+        const img = document.getElementById('modalImage');
+        img.src = src;
+        modal.classList.add('active');
+    }
+
+    function closeImageModal() {
+        const modal = document.getElementById('imageModal');
+        modal.classList.remove('active');
+    }
+
+    // Função principal para adicionar mensagem
+    function addMessage(text, type = 'received', options = {}) {
+        return new Promise((resolve) => {
+            hideTyping();
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const avatarHtml = IMAGENS.perfil 
+                ? `<img src="${IMAGENS.perfil}" alt="DS">` 
+                : 'DS';
+            
+            if (options.isAudio) {
+                const audioId = 'audio_' + Date.now();
+                
+                messageDiv.innerHTML = `
+                    <div class="message-bubble">
+                        <div class="audio-message">
+                            <button class="audio-play-btn" data-audio-id="${audioId}" onclick="toggleAudio('${audioId}', '${options.audioSrc || ''}')">
+                                <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                <svg class="pause-icon" style="display:none" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                            </button>
+                            <div class="audio-content">
+                                <div class="audio-waveform" id="waveform_${audioId}">${generateWaveform()}</div>
+                                <div class="audio-info">
+                                    <span class="audio-duration" id="duration_${audioId}">${options.duration || '0:00'}</span>
+                                </div>
+                            </div>
+                            <div class="audio-avatar">${avatarHtml}</div>
+                        </div>
+                        <div class="message-time">${getCurrentTime()}</div>
+                        <audio id="${audioId}" src="${options.audioSrc || ''}" preload="metadata"></audio>
+                    </div>
+                `;
+            } else if (options.images) {
+                // Mensagem com imagens
+                let imagesHtml = '';
+                const imgCount = options.images.length;
+                
+                if (imgCount === 1) {
+                    imagesHtml = `
+                        <div class="image-single">
+                            <img src="${options.images[0]}" alt="Imagem" onclick="openImageModal('${options.images[0]}')">
+                        </div>
+                    `;
+                } else if (imgCount >= 2) {
+                    const gridClass = imgCount === 2 ? 'grid-2' : imgCount === 3 ? 'grid-3' : 'grid-4';
+                    imagesHtml = `<div class="image-grid ${gridClass}">`;
+                    options.images.slice(0, 4).forEach(img => {
+                        imagesHtml += `<img src="${img}" alt="Imagem" onclick="openImageModal('${img}')">`;
+                    });
+                    imagesHtml += `</div>`;
+                }
+                
+                text = text.replace(/\{\{nome\}\}/g, state.userName || 'você');
+                
+                messageDiv.innerHTML = `
+                    <div class="message-bubble with-image">
+                        ${imagesHtml}
+                        ${text ? `<div class="message-text">${text}</div>` : ''}
+                        <div class="message-time">${getCurrentTime()}</div>
+                    </div>
+                `;
+            } else {
+                // Mensagem de texto normal
+                text = text.replace(/\{\{nome\}\}/g, state.userName || 'você');
+                text = text.replace(/\{\{peso\}\}/g, state.userWeight || '');
+                text = text.replace(/\{\{meta\}\}/g, state.userGoal || '');
+                
+                messageDiv.innerHTML = `
+                    <div class="message-bubble">
+                        <div class="message-text">${text}</div>
+                        <div class="message-time">${getCurrentTime()}</div>
+                    </div>
+                `;
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            scrollToBottom();
+            
+            // Delay baseado no tamanho da mensagem
+            const delay = text.length > 100 ? CONFIG.longMessageDelay : CONFIG.messageDelay;
+            setTimeout(resolve, delay);
+        });
+    }
+
+    function toggleAudio(audioId, src) {
+        const audio = document.getElementById(audioId);
+        const btn = document.querySelector(`[data-audio-id="${audioId}"]`);
+        const playIcon = btn.querySelector('.play-icon');
+        const pauseIcon = btn.querySelector('.pause-icon');
+        const waveform = document.getElementById('waveform_' + audioId);
+        const durationEl = document.getElementById('duration_' + audioId);
+        const bars = waveform.querySelectorAll('.audio-bar');
+
+        if (currentAudio && currentAudio !== audio) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+            const otherBtn = document.querySelector(`[data-audio-id="${currentAudio.id}"]`);
+            if (otherBtn) {
+                otherBtn.querySelector('.play-icon').style.display = 'block';
+                otherBtn.querySelector('.pause-icon').style.display = 'none';
+            }
+        }
+
+        if (audio.paused) {
+            audio.play().catch(e => {
+                simulateAudio(audioId, bars, durationEl, btn);
+            });
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'block';
+            currentAudio = audio;
+
+            audio.ontimeupdate = () => {
+                const progress = audio.currentTime / audio.duration;
+                const activeCount = Math.floor(progress * bars.length);
+                bars.forEach((bar, i) => {
+                    bar.classList.toggle('active', i < activeCount);
+                });
+                durationEl.textContent = formatDuration(audio.currentTime);
+            };
+
+            audio.onended = () => {
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+                bars.forEach(bar => bar.classList.remove('active'));
+                durationEl.textContent = formatDuration(audio.duration);
+            };
+        } else {
+            audio.pause();
+            playIcon.style.display = 'block';
+            pauseIcon.style.display = 'none';
+        }
+    }
+
+    function simulateAudio(audioId, bars, durationEl, btn) {
+        const playIcon = btn.querySelector('.play-icon');
+        const pauseIcon = btn.querySelector('.pause-icon');
+        let progress = 0;
+        const totalBars = bars.length;
+        const duration = 5;
+        
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'block';
+
+        const interval = setInterval(() => {
+            if (progress < totalBars) {
+                bars[progress].classList.add('active');
+                durationEl.textContent = formatDuration((progress / totalBars) * duration);
+                progress++;
+            } else {
+                clearInterval(interval);
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+                bars.forEach(bar => bar.classList.remove('active'));
+                durationEl.textContent = formatDuration(duration);
+            }
+        }, (duration * 1000) / totalBars);
+    }
+
+    function addButtons(buttons) {
+        return new Promise((resolve) => {
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.className = 'buttons-container';
+            
+            buttons.forEach(btn => {
+                const button = document.createElement('button');
+                button.className = 'option-btn';
+                button.textContent = btn.text;
+                button.onclick = () => {
+                    buttonsDiv.remove();
+                    addMessage(btn.text, 'sent').then(() => {
+                        if (btn.action) btn.action();
+                    });
+                };
+                buttonsDiv.appendChild(button);
+            });
+            
+            chatContainer.appendChild(buttonsDiv);
+            scrollToBottom();
+            resolve();
+        });
+    }
+
+    function waitForInput(placeholder = 'Digite uma mensagem') {
+        return new Promise((resolve) => {
+            userInput.placeholder = placeholder;
+            
+            const handleSend = () => {
+                const value = userInput.value.trim();
+                if (value) {
+                    userInput.value = '';
+                    addMessage(value, 'sent').then(() => {
+                        resolve(value);
+                    });
+                }
+            };
+            
+            const keyHandler = (e) => {
+                if (e.key === 'Enter') {
+                    handleSend();
+                    userInput.removeEventListener('keypress', keyHandler);
+                    sendBtn.removeEventListener('click', clickHandler);
+                }
+            };
+            
+            const clickHandler = () => {
+                handleSend();
+                userInput.removeEventListener('keypress', keyHandler);
+                sendBtn.removeEventListener('click', clickHandler);
+            };
+            
+            userInput.addEventListener('keypress', keyHandler);
+            sendBtn.addEventListener('click', clickHandler);
+            userInput.focus();
+        });
+    }
+
+    // Enviar uma única mensagem com typing
+    async function sendMessage(text, options = {}) {
+        showTyping();
+        await sleep(options.typingTime || CONFIG.typingDelay);
+        await addMessage(text, 'received', options);
+    }
+
+    // Enviar áudio
+    async function sendAudio(audioKey, duration = '0:05') {
+        showTyping();
+        await sleep(800);
+        headerStatus.textContent = 'gravando áudio...';
+        await sleep(CONFIG.audioRecordingDelay);
+        await addMessage('', 'received', { 
+            isAudio: true, 
+            audioSrc: AUDIOS[audioKey] || '',
+            duration: duration 
+        });
+    }
+
+    // Enviar imagem
+    async function sendImage(imageKeys, caption = '') {
+        showTyping();
+        await sleep(CONFIG.typingDelay);
+        
+        const images = imageKeys
+            .map(key => IMAGENS[key])
+            .filter(url => url && url.length > 0);
+        
+        if (images.length > 0) {
+            await addMessage(caption, 'received', { images: images });
+        } else {
+            // Se não tiver imagens configuradas, só manda o texto
+            if (caption) {
+                await addMessage(caption, 'received');
+            }
+        }
+    }
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // ============================================================
+    // 🚀 FLUXO DA CONVERSA
+    // ============================================================
+
+    async function startConversation() {
+        applyProfileImage();
+        
+        await sleep(1500);
+        loadingScreen.style.opacity = '0';
+        await sleep(300);
+        loadingScreen.style.display = 'none';
+
+        await sleep(1000);
+
+        await sendMessage('Meu nome é <span class="highlight">Dr. Sincero</span>...');
+        await sendMessage('Sou o criador do método de saúde que viralizou no TikTok... 📱');
+
+        await sendAudio('boasVindas', '0:08');
+
+        await sleep(500);
+
+        await sendMessage('Posso te fazer algumas perguntas pra entender melhor seu caso?');
+
+        await addButtons([
+            { text: '✅ TENHO INTERESSE', action: askName },
+            { text: '❌ Agora não', action: notNow }
+        ]);
+    }
+
+    async function askName() {
+        await sendMessage('Ótimo! 😊');
+        await sendMessage('Qual é o seu <span class="highlight">nome</span>?');
+
+        const name = await waitForInput('Digite seu nome');
+        state.userName = name;
+        
+        await sendMessage(`Muito prazer, <span class="highlight">${name}</span>! 🤝`);
+
+        await sendAudio('prazerConhecer', '0:06');
+
+        await sendMessage('Me conta, qual dessas situações mais te incomoda hoje?');
+
+        await addButtons([
+            { text: '🍔 Preciso perder peso', action: flowEmagrecimento },
+            { text: '🩸 Glicemia/açúcar alto', action: flowGlicemia },
+            { text: '❤️ Colesterol preocupante', action: flowColesterol },
+            { text: '💊 Quero cuidar da saúde geral', action: flowSaudeGeral }
+        ]);
+    }
+
+    // ============ FLUXO EMAGRECIMENTO ============
+    async function flowEmagrecimento() {
+        state.problem = 'emagrecimento';
+
+        await sendMessage(`Entendi, ${state.userName}...`);
+        await sendMessage('Qual é o seu <span class="highlight">peso aproximado</span> hoje? (em kg)');
+
+        const weight = await waitForInput('Ex: 85');
+        state.userWeight = weight;
+
+        await sendMessage('E <span class="highlight">quantos quilos</span> você gostaria de perder?');
+
+        const goal = await waitForInput('Ex: 15');
+        state.userGoal = goal;
+
+        await sendMessage(`${state.userName}, estou analisando seu caso...`);
+
+        await sendAudio('analisando', '0:04');
+
+        // Delay maior para "análise"
+        showTyping();
+        await sleep(4000);
+        hideTyping();
+
+        await sendMessage(`Hmm... ${state.userName}, preciso ser <span class="highlight">sincero</span> com você.`);
+
+        await sendAudio('situacaoEmagrecimento', '0:10');
+
+        await sendMessage(`⚠️ <span class="highlight">${state.userName}</span>, pessoas no seu perfil têm risco aumentado de:
+
+• Diabetes tipo 2
+• Pressão alta
+• Problemas no coração
+• Apneia do sono
+• Dores nas articulações
+
+Isso não é pra te assustar. É pra você entender a importância de agir <span class="highlight">AGORA</span>.`, { typingTime: 3000 });
+
+        await sendAudio('naoAssustar', '0:07');
+
+        await sendMessage(`Mas relaxa, ${state.userName}! 😊
+
+Olha só essas pessoas que estavam na <span class="highlight">mesma situação</span> que você:`);
+
+        // Enviar imagens de antes e depois - EMAGRECIMENTO
+        await sendImage(['emagrecimento1', 'emagrecimento2'], '');
+
+        await sendMessage(`✅ A Maria tinha ${parseInt(state.userWeight) + 5}kg e perdeu 12kg em 45 dias.
+✅ A Sandra tinha problema de tireoide e mesmo assim conseguiu.
+✅ A Joana tem 52 anos e disse que foi mais fácil do que imaginava.`);
+
+        await sendAudio('todasConseguiram', '0:05');
+
+        await presentOffer('emagrecimento');
+    }
+
+    // ============ FLUXO GLICEMIA ============
+    async function flowGlicemia() {
+        state.problem = 'glicemia';
+
+        await sendMessage(`Glicemia... entendi, ${state.userName}.`);
+        await sendMessage('Isso é sério e você fez bem em se preocupar. 👏');
+        await sendMessage('Você já fez exame de glicemia recentemente?');
+
+        await addButtons([
+            { text: 'Sim, tá alta', action: continueGlicemia },
+            { text: 'Sim, tá no limite', action: continueGlicemia },
+            { text: 'Não fiz ainda', action: continueGlicemia },
+            { text: 'Não sei', action: continueGlicemia }
+        ]);
+    }
+
+    async function continueGlicemia() {
+        await sendMessage(`${state.userName}, estou analisando seu caso...`);
+
+        await sendAudio('analisando', '0:04');
+
+        showTyping();
+        await sleep(3500);
+        hideTyping();
+
+        await sendMessage(`${state.userName}, vou ser direto com você:`);
+
+        await sendAudio('glicemiaExplicacao', '0:12');
+
+        await sendMessage(`⚠️ <span class="highlight">${state.userName}</span>, glicemia descontrolada pode causar:
+
+• Diabetes tipo 2
+• Problemas nos rins
+• Perda de visão
+• Feridas que não cicatrizam
+• Amputações em casos graves
+
+Não é pra te assustar. É pra você agir <span class="highlight">ANTES</span>.`, { typingTime: 3000 });
+
+        await sendMessage(`Mas calma, ${state.userName}! 😊
+
+Olha o que essas pessoas conseguiram:`);
+
+        // Enviar imagens de antes e depois - GLICEMIA
+        await sendImage(['glicemia1', 'glicemia2'], '');
+
+        await sendMessage(`✅ O Carlos tinha glicemia de 180 e baixou pra 95 em 40 dias.
+✅ A Dona Maria parou de tomar um dos remédios.
+✅ O Seu João tinha pré-diabetes e reverteu completamente.`);
+
+        await sendAudio('glicemiaAlimentacao', '0:06');
+
+        await presentOffer('glicemia');
+    }
+
+    // ============ FLUXO COLESTEROL ============
+    async function flowColesterol() {
+        state.problem = 'colesterol';
+
+        await sendMessage(`Colesterol... o famoso <span class="highlight">inimigo silencioso</span>, né ${state.userName}?`);
+        await sendMessage(`${state.userName}, estou analisando...`);
+
+        await sendAudio('analisando', '0:04');
+
+        showTyping();
+        await sleep(3500);
+        hideTyping();
+
+        await sendMessage(`${state.userName}, preciso te explicar uma coisa:`);
+
+        await sendAudio('colesterolExplicacao', '0:14');
+
+        await sendMessage(`⚠️ <span class="highlight">${state.userName}</span>, colesterol alto aumenta o risco de:
+
+• Infarto do coração
+• AVC (derrame)
+• Entupimento das artérias
+• Problemas de circulação
+
+Seu coração trabalha 24h por dia sem reclamar. Quando ele reclama... pode ser <span class="highlight">tarde</span>.`, { typingTime: 3000 });
+
+        await sendMessage(`Mas dá pra resolver, ${state.userName}! 😊
+
+Olha essas histórias:`);
+
+        // Enviar imagens de antes e depois - COLESTEROL
+        await sendImage(['colesterol1', 'colesterol2'], '');
+
+        await sendMessage(`✅ O Marcos baixou o LDL de 190 pra 120 em 60 dias.
+✅ A Dona Tereza aumentou o HDL de 35 pra 55.
+✅ O Seu Antônio evitou tomar estatina.`);
+
+        await sendAudio('colesterolDesentupidores', '0:07');
+
+        await presentOffer('colesterol');
+    }
+
+    // ============ FLUXO SAÚDE GERAL ============
+    async function flowSaudeGeral() {
+        state.problem = 'saude_geral';
+
+        await sendMessage(`Boa, ${state.userName}! Prevenção é sempre o <span class="highlight">melhor remédio</span>. 👏`);
+        await sendMessage('Me conta: qual sua idade?');
+
+        await addButtons([
+            { text: '30-40 anos', action: () => continueSaudeGeral('30-40') },
+            { text: '40-50 anos', action: () => continueSaudeGeral('40-50') },
+            { text: '50-60 anos', action: () => continueSaudeGeral('50-60') },
+            { text: '60+ anos', action: () => continueSaudeGeral('60+') }
+        ]);
+    }
+
+    async function continueSaudeGeral(age) {
+        state.userAge = age;
+
+        await sendMessage(`${state.userName}, estou analisando seu perfil...`);
+
+        await sendAudio('analisando', '0:05');
+
+        showTyping();
+        await sleep(3000);
+        hideTyping();
+
+        await sendMessage(`${state.userName}, vou ser direto:
+
+Com <span class="highlight">${age} anos</span>, esse é o momento IDEAL pra começar a cuidar da saúde.
+
+Porque depois dos 30, o corpo começa a cobrar a conta.`);
+
+        await sendAudio('saudeGeral', '0:09');
+
+        await sendMessage(`Olha só algumas transformações de pessoas que decidiram cuidar da saúde:`);
+
+        // Enviar 1 imagem de cada categoria - SAÚDE GERAL
+        await sendImage(['emagrecimento1', 'glicemia1', 'colesterol1'], '');
+
+        await presentOffer('saude_geral');
+    }
+
+    // ============ APRESENTAR OFERTA ============
+    async function presentOffer(type) {
+        const offers = {
+            emagrecimento: {
+                name: 'Kit Emagrecimento Saudável',
+                benefits: '✅ Ebook completo com o método\n✅ Planner de 30 dias\n✅ 20 receitas que aceleram emagrecimento\n✅ Meu acompanhamento',
+                cta: 'QUERO EMAGRECER DE VEZ!'
+            },
+            glicemia: {
+                name: 'Kit Controle de Glicemia',
+                benefits: '✅ Ebook sobre controle glicêmico\n✅ Planner de 30 dias\n✅ 20 receitas de baixo IG\n✅ Lista de alimentos',
+                cta: 'QUERO CONTROLAR GLICEMIA!'
+            },
+            colesterol: {
+                name: 'Kit Controle de Colesterol',
+                benefits: '✅ Ebook sobre colesterol\n✅ Planner cardio-protetor\n✅ 20 receitas pro coração\n✅ Lista de "desentupidores"',
+                cta: 'QUERO PROTEGER MEU CORAÇÃO!'
+            },
+            saude_geral: {
+                name: '100 Dicas de Saúde',
+                benefits: '✅ 100 dicas práticas\n✅ Alimentação, sono, exercício\n✅ Linguagem simples\n✅ O básico bem feito',
+                cta: 'QUERO AS 100 DICAS!'
+            }
+        };
+
+        const offer = offers[type];
+
+        await sendMessage(`${state.userName}, eu montei um programa de 30 dias especialmente pra ajudar pessoas como você.`);
+
+        await sendAudio('programa30dias', '0:10');
+
+        await sendMessage(`<span class="highlight">📚 ${offer.name}</span>
+
+${offer.benefits}`);
+
+        await sendMessage(`${state.userName}, uma consulta particular custa <span class="highlight">R$ 300-400</span>...
+
+Um nutricionista cobra <span class="highlight">R$ 200/mês</span>.`);
+
+        await sendMessage(`Mas eu não vou te cobrar isso. 🙏
+
+Eu quero que o <span class="highlight">máximo de pessoas</span> tenha acesso.`);
+
+        await sendAudio('dinheiroProblema', '0:06');
+
+        await sendMessage(`O programa completo:
+
+<s>De R$ 197,40</s>
+Por apenas <span class="highlight" style="font-size: 18px;">R$ 19,90</span> 💚
+
+Menos de <span class="highlight">R$ 0,70 por dia</span>. ☕`);
+
+        await sendMessage(`${state.userName}, esse valor é uma <span class="highlight">taxa de compromisso</span>.
+
+Porque de graça a gente não valoriza.`);
+
+        await sendAudio('garantia', '0:09');
+
+        await sendMessage(`⚠️ Preço <span class="highlight">promocional</span> por tempo limitado!`);
+
+        await sendMessage(`${state.userName}, quer começar agora? 💚`);
+
+        await addButtons([
+            { text: `✅ ${offer.cta}`, action: goToCheckout },
+            { text: '🤔 Tenho uma dúvida', action: handleDoubt },
+            { text: '❌ Agora não', action: handleNotNow }
+        ]);
+    }
+
+    async function goToCheckout() {
+        // Pega o link correto baseado no problema selecionado
+        const checkoutUrl = CONFIG.checkoutUrls[state.problem] || CONFIG.checkoutUrls.saude_geral;
+        
+        await sendMessage('Perfeito! 🎉');
+        await sendMessage(`${state.userName}, clica no botão abaixo:`);
+        
+        await sendAudio('boaSorte', '0:05');
+        
+        const checkoutBtn = document.createElement('div');
+        checkoutBtn.className = 'buttons-container';
+        checkoutBtn.innerHTML = `
+            <a href="${checkoutUrl}" target="_blank" style="
+                background: #00a884;
+                color: white;
+                padding: 16px 24px;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 500;
+                text-decoration: none;
+                text-align: center;
+                display: block;
+            ">🔒 GARANTIR MINHA VAGA AGORA</a>
+        `;
+        chatContainer.appendChild(checkoutBtn);
+        scrollToBottom();
+    }
+
+    async function handleDoubt() {
+        await sendMessage(`Claro, ${state.userName}! Manda sua dúvida:`);
+
+        await waitForInput('Digite sua dúvida');
+
+        await sendMessage('Entendi! 😊');
+        await sendMessage(`A maioria pergunta: <span class="highlight">"Funciona pra mim?"</span>
+
+Se você seguir o método, funciona. É ciência! 🧬`);
+        await sendMessage(`E lembra: <span class="highlight">garantia de 30 dias</span>. Risco zero!`);
+
+        await addButtons([
+            { text: '✅ VOU TENTAR!', action: goToCheckout },
+            { text: '❌ Ainda não', action: handleNotNow }
+        ]);
+    }
+
+    async function handleNotNow() {
+        await sendMessage(`Tudo bem, ${state.userName}. 🤝`);
+
+        await sendAudio('reflexaoFinal', '0:10');
+
+        await sendMessage(`Daqui 30 dias você pode estar <span class="highlight">igual hoje</span>...
+
+Ou mais leve, com mais energia.
+
+A diferença? <span class="highlight">20 reais</span>.`);
+
+        await sendMessage(`Quando quiser, tô aqui. 💚
+
+Cuida-se, ${state.userName}!`);
+    }
+
+    async function notNow() {
+        await sendMessage('Sem problema! 😊');
+        await sendMessage(`Quando quiser, volta aqui.
+
+Cuida-se! 💚`);
+    }
+
+    // ============ INICIALIZAÇÃO ============
+    window.onload = () => {
+        startConversation();
+    };
+</script>
+
+</body>
+</html>
